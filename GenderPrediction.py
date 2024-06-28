@@ -24,7 +24,9 @@ dffemale = pd.read_csv('Indian-Male-Names.csv')
 
 # Map gender labels to numerical values
 gender = {'m': 1, 'f': 0}
+# dfmale.gender = [gender[item] for item in dfmale.gender]
 dfmale.gender = dfmale.gender.map(gender)
+# dffemale.gender = [gender[item] for item in dffemale.gender]
 dffemale.gender = dffemale.gender.map(gender)
 
 # Drop 'race' column
@@ -34,9 +36,18 @@ dffemale = dffemale.drop(columns=['race'])
 # Concatenate DataFrames
 df = pd.concat([dfmale, dffemale])
 
-# Preprocess names using CountVectorizer
+# Shuffling the data
+dffinal = df.sample(frac=1).reset_index(drop=True)
+
+# Checking if any data is lost
+# print(dffinal.size)
+
+# Preprocess names using CountVectorizer ---> Text data to Numbers
 cv = CountVectorizer()
-X = cv.fit_transform(df['name'].values.astype('U'))
+names = dffinal['name']
+X = cv.fit_transform(names.values.astype('U'))
+
+# cv.get_feature_names_out()
 
 # Split data into training and testing sets
 Y = df.gender
@@ -51,7 +62,7 @@ accuracy = model.score(x_test, y_test)
 print("Model Accuracy:", accuracy)
 
 # Predict on new samples
-sample = ["kavya"]
+sample = [input()]
 vector = cv.transform(sample).toarray()
 prediction = model.predict(vector)
-print("Predicted Gender:", prediction)
+print("Predicted Gender:", "Male" if prediction==1 else "Female")
